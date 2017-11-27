@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
@@ -15,6 +18,9 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
+
+    RecyclerView recyclerView;
+    ClienteAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
                 ClienteDAO dao = new ClienteDAO(getBaseContext());
                 boolean sucesso = dao.salvar(nome, sexo, uf, vip);
                 if(sucesso) {
+                    Cliente cliente = dao.retornarUltimo();
+                    adapter.adicionarCliente(cliente);
+
                     //limpa os campos
                     txtNome.setText("");
                     rgSexo.setSelected(false);
@@ -74,12 +83,15 @@ public class MainActivity extends AppCompatActivity {
                     findViewById(R.id.includemain).setVisibility(View.VISIBLE);
                     findViewById(R.id.includecadastro).setVisibility(View.INVISIBLE);
                     findViewById(R.id.fab).setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     Snackbar.make(view, "Erro ao salvar, consulte os logs!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
+
             }
         });
+
+        configurarRecycler();
     }
 
     @Override
@@ -103,4 +115,18 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void configurarRecycler() {
+        // Configurando o gerenciador de layout para ser uma lista.
+        recyclerView = (RecyclerView)findViewById(R.id.recyclerView);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // Adiciona o adapter que irá anexar os objetos à lista.
+        ClienteDAO dao = new ClienteDAO(this);
+        adapter = new ClienteAdapter(dao.retornarTodos());
+        recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+    }
+
 }
