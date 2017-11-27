@@ -4,6 +4,7 @@ package soaresdeveloper.com.app.projetosqlite;
  * Created by Soares on 27/11/2017.
  */
 
+import android.content.ContentValues;
 import android.content.Context;
 
 public class ClienteDAO {
@@ -13,5 +14,14 @@ public class ClienteDAO {
 
     public ClienteDAO(Context ctx){
         gw = DbGateway.getInstance(ctx);
+    }
+
+    public boolean salvar(String nome, String sexo, String uf, boolean vip){
+        ContentValues cv = new ContentValues();
+        cv.put("Nome", nome);
+        cv.put("Sexo", sexo);
+        cv.put("UF", uf);
+        cv.put("Vip", vip ? 1 : 0);
+        return gw.getDatabase().insert(TABLE_CLIENTES, null, cv) > 0;
     }
 }
